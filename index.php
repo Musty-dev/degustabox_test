@@ -50,6 +50,7 @@
 			</div>
 			<div id="tarea_actual" class="oculto">
 					<span>Actual task: </span>
+					<span id="id_tarea_actual" class="oculto"></span>
 					<span id="nombre_tarea_actual"></span>
 					<span id="horas_tarea"></span>
 					<span>h </span>

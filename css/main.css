@@ -1,0 +1,37 @@
+body
+{
+    margin-top: 0px; 
+    margin-bottom: 0px; 
+    margin-left: 0px; 
+    margin-right: 0px;
+    padding: 0;
+    color: black; 
+    font-size: 10pt; 
+    font-family: "Trebuchet MS", sans-serif;
+    background-color: #E2E2E2;
+}
+
+#contenedor_web
+{
+	width:100%;
+	position:relative;
+}
+
+#selector_usuario,
+#selector_fecha,
+#crear_tareas,
+#listado_tareas,
+#tarea_actual,
+#tiempo_tareas
+{
+	width:100%;
+	margin-top:3px;
+	position:relative;
+	padding-left:1%;
+	box-sizing: border-box;
+}
+
+.oculto
+{
+	display: none;
+}
