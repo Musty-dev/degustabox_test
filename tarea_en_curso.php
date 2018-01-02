@@ -5,7 +5,7 @@
 		include('404.html'); 
 		die();
 	}
-	$con = mysqli_connect('localhost','root','','degustabox');
+	$con = mysqli_connect('localhost','root','','degustabox');	$usuario_seleccionado = $_POST["usuario"];
 	$usuario_seleccionado = $_POST["usuario"];
 	$fecha_seleccionada = $_POST["fecha"];
 	$sql = "select tareas.nombre as nombre_tarea,tareas.id_tarea as id_tarea, trabaja.tiempo_tarea as tiempo_tarea, trabaja.fecha_hora_inicio as fecha_inicio_tarea ".
@@ -14,7 +14,7 @@
 			"inner join tareas on trabaja.id_tarea = tareas.id_tarea ".
 			"where usuarios.id_usuario = '".$usuario_seleccionado."' ".
 			"and trabaja.fecha_tarea = '".$fecha_seleccionada."' ".
-			"and trabaja.fecha_hora_inicio <> '' ";
+			"and trabaja.fecha_hora_inicio != 0";
 	$result = mysqli_query($con,$sql);
 	if ($result->num_rows == 0)
 	{
