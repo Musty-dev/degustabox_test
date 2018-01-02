@@ -12,7 +12,7 @@
 			"from usuarios ".
 			"inner join trabaja on usuarios.id_usuario = trabaja.id_usuario ".
 			"inner join tareas on trabaja.id_tarea = tareas.id_tarea ".
-			"where usuarios.nombre = '".$usuario_seleccionado."' ".
+			"where usuarios.id_usuario = '".$usuario_seleccionado."' ".
 			"and trabaja.fecha_tarea = '".$fecha_seleccionada."' ";
 	$total_time = "00:00";
 	$result = mysqli_query($con,$sql);

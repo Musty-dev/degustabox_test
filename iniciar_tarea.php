@@ -16,20 +16,24 @@
 			"inner join tareas on trabaja.id_tarea = tareas.id_tarea ".
 			"where usuarios.id_usuario = '".$usuario_seleccionado."' ".
 			"and trabaja.fecha_tarea = '".$fecha_seleccionada."' ".
-			"and tareas.id_tarea = '".$tarea_seleccionada."' ".
-			"and trabaja.fecha_hora_inicio <> '' ";
+			"and tareas.id_tarea = '".$tarea_seleccionada."' ";
 	$result = mysqli_query($con,$sql);
 	if ($result->num_rows == 0)
 	{
 		
 		$sql_insert = "INSERT INTO trabaja (id_trabaja, id_usuario,id_tarea,fecha_tarea,fecha_hora_inicio,tiempo_tarea) ".
-					" VALUES (NULL, '".$usuario_seleccionado."','".$tarea_seleccionada."','".date('Y-m-d')."','".date('Y-m-d H:i:s')."','00:00:00')";
+					" VALUES (NULL, '".$usuario_seleccionado."','".$tarea_seleccionada."','".$fecha_seleccionada."','".date('Y-m-d H:i:s')."','00:00:00')";
 		$result = mysqli_query($con,$sql_insert);
 		$data = array('status' => 'tarea_creada');
 		echo json_encode($data);
 		die();
 	}
+	$sql_update_hora_inicio = "UPDATE trabaja SET fecha_hora_inicio = '".date('Y-m-d H:i:s')."' ".
+			" WHERE fecha_tarea = '".$fecha_seleccionada."' and id_usuario = '".$usuario_seleccionado."' and id_tarea = '".$tarea_seleccionada."' ";
+			
+	$result = mysqli_query($con,$sql_update_hora_inicio);
 	
+	$result = mysqli_query($con,$sql);
 	$row = mysqli_fetch_assoc($result);
 	$data = array('status' => 'tarea_ya_iniciada','tiempo_tarea' => $row["tiempo_tarea"], 'fecha_inicio_tarea' => $row["fecha_inicio_tarea"]);
 	echo json_encode($data);

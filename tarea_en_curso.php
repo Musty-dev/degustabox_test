@@ -8,11 +8,11 @@
 	$con = mysqli_connect('localhost','root','','degustabox');
 	$usuario_seleccionado = $_POST["usuario"];
 	$fecha_seleccionada = $_POST["fecha"];
-	$sql = "select tareas.nombre as nombre_tarea, trabaja.tiempo_tarea as tiempo_tarea, trabaja.fecha_hora_inicio as fecha_inicio_tarea ".
+	$sql = "select tareas.nombre as nombre_tarea,tareas.id_tarea as id_tarea, trabaja.tiempo_tarea as tiempo_tarea, trabaja.fecha_hora_inicio as fecha_inicio_tarea ".
 			"from usuarios ".
 			"inner join trabaja on usuarios.id_usuario = trabaja.id_usuario ".
 			"inner join tareas on trabaja.id_tarea = tareas.id_tarea ".
-			"where usuarios.nombre = '".$usuario_seleccionado."' ".
+			"where usuarios.id_usuario = '".$usuario_seleccionado."' ".
 			"and trabaja.fecha_tarea = '".$fecha_seleccionada."' ".
 			"and trabaja.fecha_hora_inicio <> '' ";
 	$result = mysqli_query($con,$sql);
@@ -24,6 +24,10 @@
 	}
 	
 	$row = mysqli_fetch_assoc($result);
-	$data = array('status' => 'tarea_en_curso','tiempo_tarea' => $row["tiempo_tarea"], 'fecha_inicio_tarea' => $row["fecha_inicio_tarea"]);
+	$data = array('status' => 'tarea_en_curso',
+				'tiempo_tarea' => $row["tiempo_tarea"], 
+				'fecha_inicio_tarea' => $row["fecha_inicio_tarea"],
+				'nombre_tarea_actual'=>$row["nombre_tarea"],
+				'id_tarea_actual'=>$row["id_tarea"]);
 	echo json_encode($data);
 	

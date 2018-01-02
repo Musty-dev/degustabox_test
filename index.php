@@ -10,6 +10,11 @@
 	</head>
 	<body>
 		<div id="contenedor_web">
+			<div id="crear_usuarios">
+				<span>Create user: </span>
+				<input id="nombre_nuevo_usuario" />
+				<button id="boton_crear_usuario" type="button">Create new user</button>
+			</div>
 			<div id="selector_usuario">
 				<span>Select user: </span>
 				<select>

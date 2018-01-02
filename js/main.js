@@ -25,8 +25,8 @@ $(document).on('click','#boton_crear_tarea', function() {
 				else
 				{
 					$('#listado_tareas select').append($('<option>', {value: response.new_id,text: $("#nombre_nueva_tarea").val()}));
+					$("#nombre_nueva_tarea").val("");
 					alert("Task created");
-					$("nombre_nueva_tarea").val("");
 				}
 			}
 		});
@@ -56,8 +56,8 @@ $(document).on('click','#boton_crear_usuario', function() {
 				else
 				{
 					$('#selector_usuario select').append($('<option>', {value: response.new_id,text: $("#nombre_nuevo_usuario").val()}));
+					$("#nombre_nuevo_usuario").val("");
 					alert("User created");
-					$("nombre_nuevo_usuario").val("");
 				}
 			}
 		});
@@ -65,6 +65,16 @@ $(document).on('click','#boton_crear_usuario', function() {
 });
 
 $(document).on('click','#boton_iniciar_tarea', function() {
+	if ($("#selector_usuario select").val() == "" || $("#listado_tareas select").val() == "")
+	{
+		alert("You must select a user and a task");
+		return;
+	}
+	if ($("#tarea_actual").hasClass("tarea_en_curso"))
+	{
+		alert("There is a task in execution");
+		return;
+	}
 	clearInterval(interval);
 	$.ajax({
 		url: get_url_web()+'iniciar_tarea.php',
@@ -77,7 +87,8 @@ $(document).on('click','#boton_iniciar_tarea', function() {
 		},
 		dataType:"json",
 		success: function (response) {
-			$("#tiempo_tareas").removeClass("oculto");
+			$("#tarea_actual").removeClass("oculto");
+			$("#tarea_actual").addClass("tarea_en_curso");
 			$("#id_tarea_actual").html($("#listado_tareas select").val());
 			$("#nombre_tarea_actual").find('option:selected').text();
 			if(response.status == "tarea_ya_iniciada")
@@ -139,12 +150,35 @@ $(document).on('click','#boton_pausar_tarea', function() {
 		{ 
 			usuario: $("#selector_usuario select").val(),
 			fecha: $("#selector_fecha input").val(),
-			tarea: $("#listado_tareas select").val()
+			tarea: $("#id_tarea_actual").html(),
+			tiempo: $("#horas_tarea").html()+":"+$("#minutos_tarea").html()+":"+$("#segundos_tarea").html()
 		},
-		dataType:"json",
+		async:false,
 		success: function (response) {
-			clearInterval(interval);
-			$("#tiempo_tareas").addClass("oculto");
+			if(response == "ok")
+			{
+				clearInterval(interval);
+				$("#tarea_actual").addClass("oculto");
+				$("#tarea_actual").removeClass("tarea_en_curso");
+			}
+			else
+			{
+				alert("Something was wrong: "+response);
+			}
+		}
+	});
+
+	$.ajax({
+		url: get_url_web()+'get_tareas.php',
+		type: 'POST',
+		async:false,
+		data: 
+		{ 
+			usuario: $("#selector_usuario select").val(),
+			fecha: $("#selector_fecha input").val()
+		},
+		success: function (response) {
+			$("#contenedor_tareas").html(response);
 		}
 	});
 });
@@ -171,9 +205,9 @@ $(document).on('change','#selector_fecha input', function() {
 });
 
 $(document).on('change','#selector_usuario select', function() {
+	clearInterval(interval);
 	if ($("#selector_usuario select").val() == "")
 	{
-		alert("You must select a user");
 		$("#contenedor_tareas").html("");
 		return;
 	}
@@ -190,7 +224,7 @@ $(document).on('change','#selector_usuario select', function() {
 			$("#contenedor_tareas").html(response);
 		}
 	});
-	
+
 	$.ajax({
 		url: get_url_web()+'tarea_en_curso.php',
 		type: 'POST',
@@ -204,14 +238,42 @@ $(document).on('change','#selector_usuario select', function() {
 		success: function (response) {
 			if(response.status == "tarea_en_curso")
 			{
-				debugger;
-				//hacer el calculo entre la fecha y hora actual y establecer las variables a ese y ya copiar el intervalo
-				var array_tiempo = response.tiempo_tarea.split(":");
-				seconds = array_tiempo[2];
-				mins = array_tiempo[1];
-				hours = array_tiempo[0];
+				$("#tarea_actual").removeClass("oculto");
+				$("#tarea_actual").addClass("tarea_en_curso");
+				$("#id_tarea_actual").html(response.id_tarea_actual);
+				$("#nombre_tarea_actual").html(response.nombre_tarea_actual);
+
+				var fecha_ini = new Date(response.fecha_inicio_tarea);
+				var fecha_actual = new Date();
+				var segundos_totales = (fecha_actual - fecha_ini) / 1000;
+
+				hours = Math.floor(segundos_totales / 3600);
+				segundos_totales -= hours * 3600;
+				
+				mins = Math.floor(segundos_totales / 60);
+				segundos_totales -= mins * 60;
+				
+				seconds = Math.floor(segundos_totales); 
+				
+				var array_tiempo_anterior = response.tiempo_tarea.split(":");
+				
+				seconds +=  parseInt(array_tiempo_anterior[2]);
+				if(seconds > 59)
+				{
+					mins += Math.floor(seconds / 60);
+					seconds = seconds % 60;
+				}
+				
+				mins +=  parseInt(array_tiempo_anterior[1]);
+				if(mins > 59)
+				{
+					hours += Math.floor(mins / 60);
+					mins = mins % 60;
+				}
+				
+				hours +=  parseInt(array_tiempo_anterior[0]);
+
 				interval = setInterval(function() {
-					var now = new Date().getTime();
 					seconds++;
 					if(seconds > 59) 
 					{
@@ -227,6 +289,11 @@ $(document).on('change','#selector_usuario select', function() {
 					$("#minutos_tarea").html(mins);
 					$("#segundos_tarea").html(seconds);
 				}, 1000);
+			}
+			else
+			{
+				$("#tarea_actual").addClass("oculto");
+				$("#tarea_actual").removeClass("tarea_en_curso");
 			}
 		}
 	});
