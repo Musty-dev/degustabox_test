@@ -1,4 +1,7 @@
 var interval;
+var seconds = 0;
+var mins = 0;
+var hours = 0;
 $(document).on('click','#boton_crear_tarea', function() {
 	if($("#nombre_nueva_tarea").val() == "")
 	{
@@ -38,21 +41,65 @@ $(document).on('click','#boton_iniciar_tarea', function() {
 		{ 
 			usuario: $("#selector_usuario select").val(),
 			fecha: $("#selector_fecha input").val(),
-			tarea: $("#selector_tarea select").val()
+			tarea: $("#listado_tareas select").val()
 		},
 		dataType:"json",
 		success: function (response) {
-			debugger;
 			if(response.status == "tarea_ya_iniciada")
 			{
-				
+				debugger;
+				var array_tiempo = response.tiempo_tarea.split(":");
+				//hacer el calculo entre la fecha y hora actual y establecer las variables a ese y ya copiar el intervalo
+				seconds = array_tiempo[2];
+				mins = array_tiempo[1];
+				hours = array_tiempo[0];
+				interval = setInterval(function() {
+					var now = new Date().getTime();
+					seconds++;
+					if(seconds > 59) 
+					{
+						mins++;
+						seconds = 0;
+					}
+					if(mins > 59)
+					{
+						hours++;
+						mins = 0;
+					}
+					$("#horas_tarea").html(hours);
+					$("#minutos_tarea").html(mins);
+					$("#segundos_tarea").html(seconds);
+				}, 1000);
 			}
 			else
 			{
-				
+				seconds = 0;
+				mins = 0;
+				hours = 0;
+				interval = setInterval(function() {
+					var now = new Date().getTime();
+					seconds++;
+					if(seconds > 59) 
+					{
+						mins++;
+						seconds = 0;
+					}
+					if(mins > 59)
+					{
+						hours++;
+						mins = 0;
+					}
+					$("#horas_tarea").html(hours);
+					$("#minutos_tarea").html(mins);
+					$("#segundos_tarea").html(seconds);
+				}, 1000);
 			}
 		}
 	});
+});
+
+$(document).on('click','#boton_pausar_tarea', function() {
+	
 });
 
 $(document).on('change','#selector_fecha input', function() {
